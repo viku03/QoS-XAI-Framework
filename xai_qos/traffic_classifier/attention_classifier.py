@@ -283,15 +283,15 @@ class AttentionTrafficClassifier(nn.Module):
             # CRITICAL: Must use the scaler from training!
             if not self.scaler_fitted:
                 raise RuntimeError(
-                    "Scaler not fitted! Model must be trained or loaded with a fitted scaler. "
-                    "The scaler should be loaded from the checkpoint during load_model()."
+                    "Scaler not fitted! Model must be loaded with load_model() first."
                 )
             
             # Transform using TRAINING scaler
             features = self.scaler.transform(raw_features)
             
-            # Persist normalized input for explainability
-            self.last_features_vector = features.flatten()
+            # Persist BOTH raw and normalized for explainability
+            self.last_features_vector_normalized = features.flatten()  # For model
+            self.last_features_vector_raw = raw_features.flatten()     # For display!
 
             x = torch.as_tensor(features, dtype=torch.float32, device=self.device)
 
@@ -315,14 +315,16 @@ class AttentionTrafficClassifier(nn.Module):
                 "class_probabilities": class_probabilities,
                 "attention_weights": attention_weights.detach().cpu().numpy()
                     if isinstance(attention_weights, torch.Tensor) else np.array(attention_weights),
-                "features": self.last_features_vector.copy(),
+                "features": self.last_features_vector_normalized.copy(),
+                "features_raw": self.last_features_vector_raw.copy(),  # Add raw features!
             }
 
         except Exception as e:
             self.logger.error(f"Error in flow classification: {e}")
             import traceback
             traceback.print_exc()
-            raise  # Re-raise to see the actual error
+            raise
+
 
 
     def load_model(self, model_path: str):
@@ -430,18 +432,17 @@ class AttentionTrafficClassifier(nn.Module):
             else:
                 att = np.array(att)
 
-            # If attention has extra dims (e.g., [batch, 1, 1]), squeeze
+            # If attention has extra dims, squeeze
             att = np.squeeze(att)
 
-            # If it matches input_dim, accept it; else ignore
+            # If it matches input_dim, accept it
             if att.ndim == 1 and att.size == self.input_dim:
                 att_vec = att.astype(np.float64)
         except Exception:
             att_vec = None
 
-        # 2) Fallback: weight×input importance from first Linear layer + last input vector
+        # 2) Fallback: weight×input importance
         if att_vec is None:
-            # Grab the first nn.Linear from the feature extractor
             first_linear = None
             for layer in self.feature_extractor.feature_layers:
                 if isinstance(layer, nn.Linear):
@@ -451,12 +452,13 @@ class AttentionTrafficClassifier(nn.Module):
             if first_linear is None:
                 return {}
 
-            W = first_linear.weight.detach().cpu().numpy()  # [hidden, input_dim]
-            w_importance = np.mean(np.abs(W), axis=0)        # [input_dim]
+            W = first_linear.weight.detach().cpu().numpy()  
+            w_importance = np.mean(np.abs(W), axis=0)
 
-            x = getattr(self, "last_features_vector", None)
+            # Use NORMALIZED features for importance calculation
+            x = getattr(self, "last_features_vector_normalized", None)
             if x is not None:
-                x = np.abs(np.array(x).reshape(-1))          # [input_dim]
+                x = np.abs(np.array(x).reshape(-1))
                 imp = w_importance * x
             else:
                 imp = w_importance
@@ -467,4 +469,13 @@ class AttentionTrafficClassifier(nn.Module):
         att_vec = np.maximum(att_vec, 1e-12)
         att_vec = att_vec / att_vec.sum()
 
-        return {name: float(score) for name, score in zip(names, att_vec)}
+        # Use RAW features for display values!
+        raw_features = getattr(self, "last_features_vector_raw", np.zeros(self.input_dim))
+
+        return {
+            name: {
+                'importance': float(score),
+                'value': float(raw_features[i])  # Show RAW values!
+            }
+            for i, (name, score) in enumerate(zip(names, att_vec))
+        }

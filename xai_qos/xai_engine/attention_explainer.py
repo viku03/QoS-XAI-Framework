@@ -187,21 +187,26 @@ class AttentionExplainer:
             traceback.print_exc()
             return self._fallback_explanation(classification_result)
             
-    def _identify_key_features(self, feature_importance: Dict[str, float], 
-                              flow_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _identify_key_features(self, feature_importance: Dict[str, Any], 
+                          flow_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Identify the most important features for the decision"""
         
         # Sort features by importance
         sorted_features = sorted(
             feature_importance.items(), 
-            key=lambda x: x[1], 
+            key=lambda x: x[1]['importance'] if isinstance(x[1], dict) else x[1], 
             reverse=True
         )
         
         key_features = []
-        for feature_name, importance in sorted_features[:self.top_k_features]:
-            # Convert numpy types to Python types
-            importance = float(importance) if hasattr(importance, 'item') else float(importance)
+        for feature_name, feat_data in sorted_features[:self.top_k_features]:
+            # Handle both old format (float) and new format (dict)
+            if isinstance(feat_data, dict):
+                importance = float(feat_data['importance'])
+                feature_value = float(feat_data['value'])
+            else:
+                importance = float(feat_data)
+                feature_value = self._get_feature_value(feature_name, flow_data)
             
             if importance < self.importance_threshold:
                 break
@@ -212,13 +217,10 @@ class AttentionExplainer:
                 'high_indicates': 'Specific traffic characteristic'
             })
             
-            # Get actual feature value
-            feature_value = self._get_feature_value(feature_name, flow_data)
-            
             key_features.append({
                 'name': feature_info['name'],
                 'importance': float(importance),
-                'value': float(feature_value) if feature_value is not None else 0.0,
+                'value': float(feature_value),  # Now shows RAW value!
                 'description': feature_info['description'],
                 'interpretation': self._interpret_feature_value(
                     feature_name, feature_value, feature_info
@@ -226,15 +228,22 @@ class AttentionExplainer:
             })
             
         return key_features
+
         
     def _generate_reasoning(self, predicted_class: str, 
-                           feature_importance: Dict[str, float],
-                           flow_data: Dict[str, Any]) -> str:
+                       feature_importance: Dict[str, Any],
+                       flow_data: Dict[str, Any]) -> str:
         """Generate human-readable reasoning for the classification"""
+        
+        # Handle both dict and float formats
+        def get_importance(value):
+            if isinstance(value, dict):
+                return float(value['importance'])
+            return float(value) if hasattr(value, 'item') else float(value)
         
         top_features = sorted(
             feature_importance.items(), 
-            key=lambda x: x[1], 
+            key=lambda x: get_importance(x[1]),  # Use helper function
             reverse=True
         )[:3]
         
@@ -242,13 +251,18 @@ class AttentionExplainer:
             f"This flow was classified as '{predicted_class}' based on the following key indicators:"
         ]
         
-        for feature_name, importance in top_features:
-            importance = float(importance) if hasattr(importance, 'item') else float(importance)
+        for feature_name, feat_data in top_features:
+            # Extract importance and value
+            if isinstance(feat_data, dict):
+                importance = float(feat_data['importance'])
+                feature_value = float(feat_data['value'])
+            else:
+                importance = float(feat_data) if hasattr(feat_data, 'item') else float(feat_data)
+                feature_value = self._get_feature_value(feature_name, flow_data)
             
             if importance < self.importance_threshold:
                 continue
                 
-            feature_value = self._get_feature_value(feature_name, flow_data)
             feature_info = self.feature_semantics.get(feature_name, {})
             
             if feature_name == 'dst_port':
@@ -288,6 +302,7 @@ class AttentionExplainer:
                 )
                 
         return ' '.join(reasoning_parts)
+
         
     def _infer_qos_requirements(self, predicted_class: str) -> Dict[str, Any]:
         """Infer QoS requirements based on application classification"""
@@ -336,7 +351,7 @@ class AttentionExplainer:
         return qos_requirements
         
     def _analyze_confidence_factors(self, classification_result: Dict[str, Any],
-                                   feature_importance: Dict[str, float]) -> Dict[str, Any]:
+                               feature_importance: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze factors affecting classification confidence"""
         
         confidence = float(classification_result['confidence'])
@@ -363,17 +378,27 @@ class AttentionExplainer:
         if confidence < 0.7:
             factors['uncertainty_sources'].append('Low overall prediction confidence')
             
-        # Identify confidence drivers
-        top_features = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)[:2]
+        # Identify confidence drivers - handle both dict and float formats
+        def get_importance(value):
+            if isinstance(value, dict):
+                return float(value['importance'])
+            return float(value) if hasattr(value, 'item') else float(value)
         
-        for feature_name, importance in top_features:
-            importance = float(importance) if hasattr(importance, 'item') else float(importance)
+        top_features = sorted(
+            feature_importance.items(), 
+            key=lambda x: get_importance(x[1]),
+            reverse=True
+        )[:2]
+        
+        for feature_name, feat_data in top_features:
+            importance = get_importance(feat_data)
             if importance > 0.15:  # High importance threshold
                 factors['confidence_drivers'].append(
                     f'Strong {feature_name.replace("_", " ")} signature'
                 )
                 
         return factors
+
         
     def _get_alternative_classes(self, class_probabilities: Dict[str, float]) -> List[Dict[str, float]]:
         """Get alternative classification possibilities"""
