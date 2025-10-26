@@ -1,0 +1,110 @@
+2025-10-25 21:49:23,032 - root - INFO - ============================================================
+2025-10-25 21:49:23,032 - root - INFO - XAI-QoS Traffic Classifier Training
+2025-10-25 21:49:23,032 - root - INFO - ============================================================
+2025-10-25 21:49:23,090 - root - INFO - Using device: MPS
+2025-10-25 21:49:23,090 - root - INFO - 🚀 Mac M1/M2 GPU acceleration enabled!
+2025-10-25 21:49:23,090 - root - INFO - Loading data from data/processed/traffic_data.csv
+2025-10-25 21:49:23,183 - root - INFO - Dataset shape: (27938, 50)
+2025-10-25 21:49:23,183 - root - INFO - Classes: ['background', 'ftp', 'http_browsing']
+2025-10-25 21:49:23,183 - root - INFO - Class distribution: [10000  7938 10000]
+2025-10-25 21:49:23,184 - root - INFO - Creating data loaders...
+2025-10-25 21:49:23,209 - root - INFO - Train set: 19556 samples
+2025-10-25 21:49:23,209 - root - INFO - Validation set: 2794 samples
+2025-10-25 21:49:23,209 - root - INFO - Test set: 5588 samples
+2025-10-25 21:49:23,267 - root - INFO - 
+Model Architecture:
+2025-10-25 21:49:23,267 - root - INFO -   Total parameters: 67,651
+2025-10-25 21:49:23,267 - root - INFO -   Trainable parameters: 67,651
+2025-10-25 21:49:23,651 - root - INFO - Starting training for 10 epochs on mps
+2025-10-25 21:49:23,652 - root - INFO - Checkpoints will be saved every 5 epochs to checkpoints/
+2025-10-25 21:50:21,582 - root - INFO - 
+============================================================
+2025-10-25 21:50:21,582 - root - INFO - Training completed!
+2025-10-25 21:50:21,582 - root - INFO - Best validation accuracy: 96.46%
+2025-10-25 21:50:21,582 - root - INFO - ============================================================
+2025-10-25 21:50:21,620 - root - INFO - Evaluating model on test set...
+2025-10-25 21:50:21,949 - root - INFO - 
+============================================================
+2025-10-25 21:50:21,949 - root - INFO - Test Accuracy: 96.05%
+2025-10-25 21:50:21,949 - root - INFO - ============================================================
+2025-10-25 21:50:21,956 - root - INFO - 
+Classification Report:
+2025-10-25 21:50:21,961 - root - INFO -                precision    recall  f1-score   support
+
+   background       0.94      0.97      0.96      2000
+          ftp       0.97      1.00      0.98      1588
+http_browsing       0.97      0.92      0.95      2000
+
+     accuracy                           0.96      5588
+    macro avg       0.96      0.96      0.96      5588
+ weighted avg       0.96      0.96      0.96      5588
+
+2025-10-25 21:50:21,974 - xai_qos.traffic_classifier.attention_classifier - INFO - Model saved successfully to models/xai_qos_classifier.pth
+2025-10-25 21:50:21,974 - root - INFO - 
+✅ Final model saved to models/xai_qos_classifier.pth
+2025-10-25 21:50:23,116 - root - INFO - Training history saved to training_history.png
+2025-10-25 21:50:23,328 - root - INFO - Confusion matrix saved to confusion_matrix.png
+2025-10-25 21:50:23,328 - root - INFO - 
+============================================================
+2025-10-25 21:50:23,328 - root - INFO - Training completed successfully! 🎉
+2025-10-25 21:50:23,328 - root - INFO - ============================================================
+2025-10-25 21:50:23,328 - root - INFO - Best validation accuracy: 96.46%
+2025-10-25 21:50:23,328 - root - INFO - Final test accuracy: 96.05%
+2025-10-25 21:50:23,328 - root - INFO - Model saved to: models/xai_qos_classifier.pth
+2025-10-25 21:50:23,328 - root - INFO - Checkpoints saved to: checkpoints/
+2025-10-25 21:50:23,328 - root - INFO - ============================================================
+2025-10-25 21:55:22,554 - root - INFO - ============================================================
+2025-10-25 21:55:22,554 - root - INFO - XAI-QoS Traffic Classifier Training
+2025-10-25 21:55:22,554 - root - INFO - ============================================================
+2025-10-25 21:55:22,575 - root - INFO - Using device: MPS
+2025-10-25 21:55:22,576 - root - INFO - 🚀 Mac M1/M2 GPU acceleration enabled!
+2025-10-25 21:55:22,576 - root - INFO - Loading data from data/processed/traffic_data.csv
+2025-10-25 21:55:22,648 - root - INFO - Dataset shape: (27938, 50)
+2025-10-25 21:55:22,648 - root - INFO - Classes: ['background', 'ftp', 'http_browsing']
+2025-10-25 21:55:22,649 - root - INFO - Class distribution: [10000  7938 10000]
+2025-10-25 21:55:22,649 - root - INFO - Creating data loaders...
+2025-10-25 21:55:22,671 - root - INFO - Train set: 19556 samples
+2025-10-25 21:55:22,671 - root - INFO - Validation set: 2794 samples
+2025-10-25 21:55:22,671 - root - INFO - Test set: 5588 samples
+2025-10-25 21:55:22,694 - root - INFO - 
+Model Architecture:
+2025-10-25 21:55:22,694 - root - INFO -   Total parameters: 67,651
+2025-10-25 21:55:22,694 - root - INFO -   Trainable parameters: 67,651
+2025-10-25 21:55:23,070 - root - INFO - Starting training for 50 epochs on mps
+2025-10-25 21:55:23,071 - root - INFO - Checkpoints will be saved every 10 epochs to checkpoints/
+2025-10-25 21:59:41,369 - root - INFO - 
+============================================================
+2025-10-25 21:59:41,370 - root - INFO - Training completed!
+2025-10-25 21:59:41,370 - root - INFO - Best validation accuracy: 96.81%
+2025-10-25 21:59:41,370 - root - INFO - ============================================================
+2025-10-25 21:59:41,406 - root - INFO - Evaluating model on test set...
+2025-10-25 21:59:41,737 - root - INFO - 
+============================================================
+2025-10-25 21:59:41,737 - root - INFO - Test Accuracy: 96.47%
+2025-10-25 21:59:41,737 - root - INFO - ============================================================
+2025-10-25 21:59:41,744 - root - INFO - 
+Classification Report:
+2025-10-25 21:59:41,750 - root - INFO -                precision    recall  f1-score   support
+
+   background       0.96      0.94      0.95      2000
+          ftp       0.99      1.00      0.99      1588
+http_browsing       0.94      0.96      0.95      2000
+
+     accuracy                           0.96      5588
+    macro avg       0.97      0.97      0.97      5588
+ weighted avg       0.96      0.96      0.96      5588
+
+2025-10-25 21:59:41,763 - xai_qos.traffic_classifier.attention_classifier - INFO - Model saved successfully to models/xai_qos_classifier.pth
+2025-10-25 21:59:41,763 - root - INFO - 
+✅ Final model saved to models/xai_qos_classifier.pth
+2025-10-25 21:59:42,149 - root - INFO - Training history saved to training_history.png
+2025-10-25 21:59:42,370 - root - INFO - Confusion matrix saved to confusion_matrix.png
+2025-10-25 21:59:42,370 - root - INFO - 
+============================================================
+2025-10-25 21:59:42,370 - root - INFO - Training completed successfully! 🎉
+2025-10-25 21:59:42,370 - root - INFO - ============================================================
+2025-10-25 21:59:42,370 - root - INFO - Best validation accuracy: 96.81%
+2025-10-25 21:59:42,370 - root - INFO - Final test accuracy: 96.47%
+2025-10-25 21:59:42,370 - root - INFO - Model saved to: models/xai_qos_classifier.pth
+2025-10-25 21:59:42,370 - root - INFO - Checkpoints saved to: checkpoints/
+2025-10-25 21:59:42,370 - root - INFO - ============================================================

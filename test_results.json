@@ -1,0 +1,38 @@
+[
+  {
+    "test_name": "HTTP Web Browsing",
+    "predicted_class": "http_browsing",
+    "confidence": 0.9802944660186768,
+    "qos_priority": "normal"
+  },
+  {
+    "test_name": "Video Streaming (High Bandwidth)",
+    "predicted_class": "http_browsing",
+    "confidence": 0.978992760181427,
+    "qos_priority": "normal"
+  },
+  {
+    "test_name": "Video Conference (Zoom-like)",
+    "predicted_class": "http_browsing",
+    "confidence": 0.9796276092529297,
+    "qos_priority": "normal"
+  },
+  {
+    "test_name": "Large File Transfer (FTP-like)",
+    "predicted_class": "http_browsing",
+    "confidence": 0.9789276123046875,
+    "qos_priority": "normal"
+  },
+  {
+    "test_name": "Gaming Traffic (Low Latency)",
+    "predicted_class": "http_browsing",
+    "confidence": 0.9802426695823669,
+    "qos_priority": "normal"
+  },
+  {
+    "test_name": "Background Transfer (Low Priority)",
+    "predicted_class": "http_browsing",
+    "confidence": 0.9787976145744324,
+    "qos_priority": "normal"
+  }
+]
